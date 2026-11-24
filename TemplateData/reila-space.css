@@ -66,6 +66,14 @@ body { font-family: system-ui, -apple-system, "Yu Gothic", sans-serif; }
 .reila-focus-controls #reila-focus-start:disabled { background: #e7ccd6; color: #623f4d; cursor: default; }
 .reila-focus-controls :focus-visible { outline: 3px solid #4b2a38; outline-offset: 2px; }
 #reila-focus-clock { font-size: 2rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.reila-word { background: #fff1f0; }
+.reila-word p, .reila-footprints p { margin: 0; line-height: 1.65; }
+.reila-word p { font-size: 1.125rem; }
+.reila-footprints .reila-footprint-detail {
+  margin-top: 4px;
+  color: #704457;
+  font-size: .875rem;
+}
 @media (min-width: 680px) {
   .reila-panel { padding-inline: 24px; min-height: auto; }
   .reila-cards { grid-template-columns: 3fr 2fr; }

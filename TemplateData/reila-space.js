@@ -8,6 +8,58 @@
     Greeting: "あいさつしてるよ"
   };
   const bands = { Morning: "朝", Day: "昼", Evening: "夕方", Night: "夜", DeepNight: "深夜" };
+  const dailyWords = {
+    Morning: [
+      "おはよ！ 窓のそば、もう明るくなってきたよ。",
+      "朝の机、まだまっさら。まずはお茶にしよっか！",
+      "んー、よく伸びた！ 朝の光って気持ちいいね。",
+      "おはよ〜。まだぼんやりしてたら、ここでゆっくり目を覚まそ。",
+      "朝いちばんの一杯、何にする？ わたしはミルクティー気分！",
+      "カーテンを開けたよ。窓ぎわの席、よかったらどうぞ！",
+      "おはよ！ 今日はどのマグにしようかな。きみならどれにする？",
+      "朝の部屋、しーんとしてて好き。きみの足音が聞こえた気がしたよ。"
+    ],
+    Day: [
+      "お昼の光、机のはしっこまで来てるよ。ちょっと座ってく？",
+      "さっきの本、いいところで閉じちゃった。続きが楽しみ！",
+      "おやつのこと考えてたら手が止まっちゃった。きみは何が好き？",
+      "いらっしゃい！ 窓のそばでおしゃべりしたい気分だよ。",
+      "机の上を片づけたら、お茶を置く場所ができたよ。やった！",
+      "ほんのちょっとでも、顔が見られてうれしいな。",
+      "今日のしおりはこのページ。窓を眺める時間も好きなんだ。",
+      "ひと息ついたら、お茶がちょうどいい温度になってた！"
+    ],
+    Evening: [
+      "夕方の窓、つい見入っちゃうね。きみもこっち来る？",
+      "そろそろ灯りをつけよっか。夕方の部屋も好きなんだ。",
+      "夕方になると、温かいものが恋しくなるなあ。今夜は何食べる？",
+      "おかえりって言いたくなる時間だね。ふふ、いらっしゃい！",
+      "窓の色が変わってきたよ。読みかけの本は、ここでひと区切り。",
+      "夕方の椅子、どうぞ。わたしも隣でひと休みするね。",
+      "昼と夜のあいだって短いね。今の窓の色、覚えとこっと。",
+      "夕方のお茶をいれたよ。椅子のところで、のんびり飲もう？"
+    ],
+    Night: [
+      "こんばんは！ 灯りのそばで読む本って、なんだかいいよね。",
+      "机の灯り、あったかい色だね。ここで少し話してく？",
+      "夜のお茶は香りで選びたいな。今日は何にしよっか。",
+      "こんばんは〜。椅子、空いてるよ。わたしはもう少しだけ読書。",
+      "本を閉じたら、部屋が急に静かに聞こえたよ。",
+      "窓の外は暗いけど、ここの灯りはまだついてるよ。",
+      "夜の部屋へようこそ！ のんびりしてってね。",
+      "今日はこのページまで。しおりを挟む音、けっこう好きなんだ。"
+    ],
+    DeepNight: [
+      "すやすやしてるかも。来てくれたきみに、おやすみのメモを置いとくね。",
+      "深夜の部屋へようこそ。しーっ、わたしは夢の中だよ。",
+      "毛布にくるまってたら、さっきの本の続きを夢に見た気がする。",
+      "もう寝ちゃったけど、ひとことだけ。寄ってくれてうれしいな。",
+      "おやすみ前に、机に小さなメモを残しといたよ。見つけてくれた？",
+      "夜ふかしのきみに、小さな声でこんばんは。ここ、静かでしょ？",
+      "寝る前に椅子を戻して、本も閉じたよ。部屋がしんとしてるね。",
+      "眠る前に書いたメモだよ。今ごろどんな夢を見てるかな。"
+    ]
+  };
   const weather = {
     Neutral: "情報なし", Clear: "晴れ", Cloudy: "曇り",
     Rain: "雨", Snow: "雪", Thunderstorm: "雷雨"
@@ -35,6 +87,64 @@
   function write(element, value) {
     if (element.textContent !== value) element.textContent = value;
   }
+
+  const word = document.querySelector("#reila-word");
+  const visits = document.querySelector("#reila-visits");
+  const previousVisit = document.querySelector("#reila-previous-visit");
+  const footprintKey = "reila-room-v2:footprints:v1";
+  const visitDateFormat = new Intl.DateTimeFormat("ja-JP", { dateStyle: "long" });
+  const numberFormat = new Intl.NumberFormat("ja-JP");
+  const queryBand = new URLSearchParams(location.search).get("preview-time")?.toLowerCase();
+  const previewBand = Object.keys(bands).find(band => band.toLowerCase() === queryBand);
+
+  function localBand(hour) {
+    if (hour < 6) return "DeepNight";
+    if (hour < 10) return "Morning";
+    if (hour < 17) return "Day";
+    if (hour < 20) return "Evening";
+    return "Night";
+  }
+
+  function renderWord() {
+    const now = new Date();
+    const band = state?.timeBand ?? previewBand ?? localBand(now.getHours());
+    // Use the local calendar day as a UTC ordinal so daylight saving never skips a note.
+    const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+    const lines = dailyWords[band];
+    write(word, lines[((day % lines.length) + lines.length) % lines.length]);
+  }
+
+  function recordVisit() {
+    try {
+      let saved;
+      try { saved = JSON.parse(localStorage.getItem(footprintKey)); } catch (error) {
+        if (!(error instanceof SyntaxError)) throw error;
+      }
+      const count = Number.isSafeInteger(saved?.count) && saved.count > 0 ? saved.count : 0;
+      const lastDay = typeof saved?.lastDay === "string" && /^\d{4}-\d{2}-\d{2}$/.test(saved.lastDay)
+        ? new Date(saved.lastDay + "T00:00:00") : null;
+      const now = new Date();
+      const day = [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+        .map(value => String(value).padStart(2, "0")).join("-");
+      const total = Math.min(count + 1, Number.MAX_SAFE_INTEGER);
+      localStorage.setItem(footprintKey, JSON.stringify({ count: total, lastDay: day }));
+      write(visits, `遊びに来た回数 ${numberFormat.format(total)}回`);
+      if (count && lastDay && Number.isFinite(lastDay.getTime())) {
+        write(previousVisit, `前に来た日 ${visitDateFormat.format(lastDay)}`);
+        previousVisit.hidden = false;
+      }
+    } catch {
+      write(visits, "このブラウザーでは足あとを保存できないみたい。来てくれてうれしいよ。");
+    }
+  }
+
+  // Serialize same-origin visits in browsers that support Web Locks.
+  if (navigator.locks) navigator.locks.request(footprintKey, recordVisit).catch(recordVisit);
+  else recordVisit();
+  renderWord();
+  window.addEventListener("reila:state", renderWord);
+  window.addEventListener("pageshow", renderWord);
+  setInterval(renderWord, 30000);
 
   function send(method, value) {
     if (!unity) return false;
@@ -202,6 +312,7 @@
   document.addEventListener("visibilitychange", () => {
     invalidate();
     renderFocus();
+    if (!document.hidden) renderWord();
   });
   window.addEventListener("pagehide", invalidate);
   document.querySelector("#unity-canvas").addEventListener("webglcontextlost", invalidate);
