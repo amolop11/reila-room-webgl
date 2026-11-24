@@ -82,7 +82,11 @@ body { font-family: system-ui, -apple-system, "Yu Gothic", sans-serif; }
     padding-top: env(safe-area-inset-top, 0px);
     overflow: hidden;
   }
-  #unity-container { flex: none; }
+  #unity-container {
+    flex: none;
+    /* The stock Unity mobile template gives this element height: 100%. */
+    height: auto !important;
+  }
   #unity-fullscreen-container {
     max-width: min(
       calc(100% - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)),
