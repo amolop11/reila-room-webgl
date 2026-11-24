@@ -52,6 +52,23 @@
           <button type="button" id="reila-invite" disabled>作業に誘う</button>
           <p id="reila-invite-feedback" role="status"></p>
         </section>
+        <section class="reila-card reila-focus" aria-labelledby="reila-focus-title">
+          <h2 id="reila-focus-title">一緒に集中タイマー</h2>
+          <p id="reila-focus-reply" role="status">ひと区切り、Reilaと机に向かおう。</p>
+          <div class="reila-focus-controls">
+            <label for="reila-focus-duration">時間</label>
+            <select id="reila-focus-duration">
+              <option value="60">1分</option>
+              <option value="300">5分</option>
+              <option value="900">15分</option>
+              <option value="1500" selected>25分</option>
+            </select>
+            <button type="button" id="reila-focus-start" disabled>一緒に始める</button>
+            <span id="reila-focus-clock" role="timer" aria-label="残り時間" hidden></span>
+            <button type="button" id="reila-focus-stop" hidden>ここで終える</button>
+          </div>
+          <p id="reila-focus-activity" hidden></p>
+        </section>
       </div>
     </main>
     <script src="TemplateData/reila-space.js"></script>

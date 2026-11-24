@@ -41,6 +41,27 @@ body { font-family: system-ui, -apple-system, "Yu Gothic", sans-serif; }
 #reila-invite:focus-visible { outline: 3px solid #4b2a38; outline-offset: 3px; }
 #reila-invite-feedback { margin: 10px 0 0; }
 #reila-invite-feedback:empty { display: none; }
+.reila-focus { grid-column: 1 / -1; background: #fff3f6; }
+.reila-focus p { margin: 0 0 12px; line-height: 1.55; }
+.reila-focus #reila-focus-activity { margin: 10px 0 0; color: #704457; }
+.reila-focus-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.reila-focus-controls:has(#reila-focus-stop:not([hidden])) :is(label, select, #reila-focus-start) {
+  display: none;
+}
+.reila-focus-controls :is(button, select) {
+  min-height: 44px;
+  border: 1px solid #c68c9f;
+  border-radius: 14px;
+  padding: 6px 12px;
+  background: #fffafd;
+  color: inherit;
+  font: inherit;
+}
+.reila-focus-controls button { cursor: pointer; }
+.reila-focus-controls #reila-focus-start { background: #883c59; color: white; }
+.reila-focus-controls #reila-focus-start:disabled { background: #e7ccd6; color: #623f4d; cursor: default; }
+.reila-focus-controls :focus-visible { outline: 3px solid #4b2a38; outline-offset: 2px; }
+#reila-focus-clock { font-size: 2rem; font-weight: 650; font-variant-numeric: tabular-nums; }
 @media (min-width: 680px) {
   .reila-panel { padding-inline: 24px; min-height: auto; }
   .reila-cards { grid-template-columns: 3fr 2fr; }
